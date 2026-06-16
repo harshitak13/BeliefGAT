@@ -1,0 +1,18 @@
+# Replace placeholder values with your real API keys.
+# Never commit configs/api_keys.yaml with real secrets.
+groq:
+  api_key: "REPLACE_WITH_YOUR_GROQ_API_KEY"
+  base_url: "https://api.groq.com/openai/v1"
+  default_temperature: 0.1
+  default_max_tokens: 600
+  request_timeout_seconds: 30
+
+openai:
+  api_key: "REPLACE_WITH_YOUR_OPENAI_API_KEY_OR_LEAVE_BLANK"
+  base_url: "https://api.openai.com/v1"
+  default_model: "gpt-4o"
+  default_temperature: 0.1
+  default_max_tokens: 600
+  request_timeout_seconds: 30
+
+default_provider: "groq"
