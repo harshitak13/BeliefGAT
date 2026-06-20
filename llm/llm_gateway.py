@@ -11,8 +11,8 @@ import aiohttp
 from llm.output_parser import LLMDecision, OutputParser
 
 
-GROQ_ALIASES = {"llama_31_8b", "llama_33_70b", "llama_4_scout_17b", "qwen3_32b"}
-OPENAI_ALIASES = {"gpt_oss_120b", "gpt_4o"}
+GROQ_ALIASES = {"llama_31_8b", "llama_33_70b", "gpt_oss_120b", "gpt_oss_20b", "llama_4_scout_17b", "qwen3_32b"}
+OPENAI_ALIASES = {"gpt_4o"}
 
 
 class LLMGateway:

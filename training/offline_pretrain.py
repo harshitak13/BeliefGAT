@@ -10,6 +10,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from models.iql import OfflineIQLTrainer
 from utils.config import load_yaml
 
+try:
+    import torch
+except Exception:  # pragma: no cover
+    torch = None
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Offline IQL pretraining for BeliefGAT.")
@@ -20,14 +25,19 @@ def main() -> None:
     parser.add_argument("--collect_if_missing", action="store_true", default=True)
     args = parser.parse_args()
 
+    if torch is None:
+        raise ImportError("torch is required to write offline IQL checkpoints")
     cfg = load_yaml(args.config)
     save_dir = Path(args.save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
-    stats = OfflineIQLTrainer().train_placeholder(args.epochs)
-    payload = {"config": args.config, "env_name": cfg.get("env_name"), "batch_size": args.batch_size, **stats}
-    (save_dir / "iql.pt").write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    (save_dir / "pretrain_summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(f"Saved offline checkpoint placeholder to {save_dir / 'iql.pt'}")
+    checkpoint = OfflineIQLTrainer(cfg).train(args.epochs, args.batch_size)
+    checkpoint["source_config"] = args.config
+    checkpoint["env_name"] = cfg.get("env_name")
+    checkpoint["batch_size"] = args.batch_size
+    torch.save(checkpoint, save_dir / "iql.pt")
+    summary = {k: v for k, v in checkpoint.items() if not k.endswith("state_dict")}
+    (save_dir / "pretrain_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(f"Saved offline IQL checkpoint to {save_dir / 'iql.pt'}")
 
 
 if __name__ == "__main__":

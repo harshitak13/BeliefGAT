@@ -10,6 +10,8 @@ import yaml
 GROQ_MODEL_IDS = {
     "llama_31_8b": "llama-3.1-8b-instant",
     "llama_33_70b": "llama-3.3-70b-versatile",
+    "gpt_oss_120b": "openai/gpt-oss-120b",
+    "gpt_oss_20b": "openai/gpt-oss-20b",
     "llama_4_scout_17b": "meta-llama/llama-4-scout-17b-16e-instruct",
     "qwen3_32b": "qwen/qwen3-32b",
 }
