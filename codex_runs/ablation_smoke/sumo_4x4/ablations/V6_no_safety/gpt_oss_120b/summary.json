@@ -1,0 +1,31 @@
+{
+  "env_name": "sumo_4x4",
+  "config": "configs/sumo_4x4.yaml",
+  "episodes": 1,
+  "llm_backend": "gpt_oss_120b",
+  "ablation": "V6_no_safety",
+  "baseline": null,
+  "results_dir": "C:\\Users\\harsh\\Desktop\\RL\\BeliefGAT\\codex_runs\\ablation_smoke\\sumo_4x4\\ablations\\V6_no_safety\\gpt_oss_120b",
+  "final_metrics": {
+    "episode": 1,
+    "att": 75.08505377145246,
+    "queue": 7.508505377145246,
+    "delay": 75.08505377145246,
+    "throughput": 46.498298924570946,
+    "ood_trigger_rate": 0.0,
+    "policy_trust_online": 0.0,
+    "policy_trust_offline": 1.0,
+    "policy_trust_conservative": 0.0,
+    "kl_divergence": 0.0,
+    "ev_clearance_time": 0,
+    "post_event_clearance_time": 0,
+    "civic_llm_trigger_rate": 0.0,
+    "llm_intervention_ratio": 0.0,
+    "override_rate": 0.0,
+    "safety_adjustment_rate": 0.0,
+    "safety_violation_count": 11.0,
+    "latency_mean_ms": 0.0,
+    "latency_p95_ms": 0.0,
+    "latency_p99_ms": 0.0
+  }
+}

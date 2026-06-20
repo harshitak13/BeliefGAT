@@ -1,0 +1,18 @@
+{
+  "checkpoint_version": 1,
+  "algorithm": "iql_dqn_warmstart",
+  "config": {
+    "node_feat_dim": 40,
+    "hidden_dim": 128,
+    "num_phases": 4,
+    "gamma": 0.99
+  },
+  "dataset_size": 1024,
+  "epochs": 1,
+  "q_loss": 0.034983862191438675,
+  "v_loss": 0.02619890682399273,
+  "policy_loss": 2.0307857990264893,
+  "source_config": "configs/sumo_4x4.yaml",
+  "env_name": "sumo_4x4",
+  "batch_size": 256
+}

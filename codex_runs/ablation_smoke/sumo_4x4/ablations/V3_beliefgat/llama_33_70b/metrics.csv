@@ -1,0 +1,2 @@
+episode,att,queue,delay,throughput,ood_trigger_rate,policy_trust_online,policy_trust_offline,policy_trust_conservative,kl_divergence,ev_clearance_time,post_event_clearance_time,civic_llm_trigger_rate,llm_intervention_ratio,override_rate,safety_adjustment_rate,safety_violation_count,latency_mean_ms,latency_p95_ms,latency_p99_ms
+1,76.91838710478581,7.69183871047858,76.91838710478581,46.461632257904284,0.0,0.0,1.0,0.0,0.0,0,0,0.0,0.0,0.0,0.4583333333333333,0.0,0.0,0.0,0.0

@@ -33,12 +33,30 @@ Before remote LLM publication runs, copy `configs/api_keys.yaml.example` to
    or CityFlow files exist in `envs/`.
 2. Validate the Groq API key when remote LLM runs are enabled.
 3. Run offline IQL pretraining and save `checkpoints/publication/{network}/iql.pt`.
-4. Run a no-LLM BeliefGAT control experiment with the offline checkpoint loaded.
-5. Run full BeliefGAT with civic context, OOD/risk logic, safety projection, and
-   LLM intervention for each of the five Groq LLM backends.
+4. Run every configured ablation with the offline checkpoint loaded.
+5. For LLM-enabled ablations, run each selected Groq backend; for non-LLM
+   ablations, run a single `no_llm` job.
 6. Store per-run outputs in `results/publication/{network}/`.
 7. Write `results/publication/{network}/publication_summary.json` containing the
    checkpoint path, backend list, and all run summaries.
+
+The default ablation suite is:
+
+```text
+V1_gat_only
+V2_safegat
+V3_beliefgat
+V4_citygat
+V5_full
+V6_no_safety
+V7_no_llm
+```
+
+To run a subset, pass `--ablations`, for example:
+
+```powershell
+python .\run_publication.py --network sumo_4x4 --ablations V1_gat_only V5_full V7_no_llm
+```
 
 For short wiring checks only, append:
 

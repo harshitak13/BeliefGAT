@@ -1,0 +1,31 @@
+{
+  "env_name": "sumo_4x4",
+  "config": "configs/sumo_4x4.yaml",
+  "episodes": 1,
+  "llm_backend": "qwen3_32b",
+  "ablation": "V4_citygat",
+  "baseline": null,
+  "results_dir": "C:\\Users\\harsh\\Desktop\\RL\\BeliefGAT\\codex_runs\\ablation_smoke\\sumo_4x4\\ablations\\V4_citygat\\qwen3_32b",
+  "final_metrics": {
+    "episode": 1,
+    "att": 72.58505377145246,
+    "queue": 7.258505377145246,
+    "delay": 72.58505377145246,
+    "throughput": 46.54829892457096,
+    "ood_trigger_rate": 0.0,
+    "policy_trust_online": 0.0,
+    "policy_trust_offline": 1.0,
+    "policy_trust_conservative": 0.0,
+    "kl_divergence": 0.0,
+    "ev_clearance_time": 0,
+    "post_event_clearance_time": 0,
+    "civic_llm_trigger_rate": 0.0,
+    "llm_intervention_ratio": 0.0,
+    "override_rate": 0.0,
+    "safety_adjustment_rate": 0.4166666666666667,
+    "safety_violation_count": 0.0,
+    "latency_mean_ms": 0.0,
+    "latency_p95_ms": 0.0,
+    "latency_p99_ms": 0.0
+  }
+}

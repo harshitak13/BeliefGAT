@@ -10,6 +10,8 @@ from typing import Any
 
 import yaml
 
+from agents.safegat_agent import ABLATION_CONFIGS
+
 
 REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_GROQ_LLMS = ["llama_31_8b", "llama_33_70b", "gpt_oss_120b", "gpt_oss_20b", "qwen3_32b"]
@@ -87,6 +89,50 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def should_run_ablation(ablation_name: str, args: argparse.Namespace) -> bool:
+    llm_enabled = bool(ABLATION_CONFIGS[ablation_name].get("llm_enabled", False))
+    if llm_enabled and args.skip_llm:
+        return False
+    if not llm_enabled and args.skip_no_llm:
+        return False
+    return True
+
+
+def run_ablation(
+    spec: NetworkSpec,
+    common: list[str],
+    results_root: Path,
+    ablation_name: str,
+    backend: str | None,
+    args: argparse.Namespace,
+) -> dict[str, Any]:
+    llm_enabled = bool(ABLATION_CONFIGS[ablation_name].get("llm_enabled", False))
+    run_dir = results_root / "ablations" / ablation_name
+    if llm_enabled:
+        run_dir = run_dir / str(backend)
+    else:
+        run_dir = run_dir / "no_llm"
+
+    cmd = [
+        sys.executable,
+        spec.runner,
+        *common,
+        "--results_dir",
+        str(run_dir),
+        "--ablation",
+        ablation_name,
+        "--llm_enabled",
+        str(llm_enabled),
+    ]
+    if llm_enabled:
+        cmd.extend(["--llm_backend", str(backend)])
+        if not args.local_llm:
+            cmd.append("--remote_llm")
+
+    run_command(cmd, args.dry_run)
+    return read_json(run_dir / "summary.json")
+
+
 def run_publication(args: argparse.Namespace) -> dict[str, Any]:
     spec = NETWORKS[args.network]
     validate_environment_assets(spec)
@@ -107,6 +153,7 @@ def run_publication(args: argparse.Namespace) -> dict[str, Any]:
         "steps_per_episode": args.steps_per_episode,
         "checkpoint": str(checkpoint_path),
         "llm_backends": [] if args.skip_llm else args.llm_backends,
+        "ablations": args.ablations,
         "remote_llm": not args.local_llm,
         "mock": args.mock,
         "runs": {},
@@ -146,44 +193,31 @@ def run_publication(args: argparse.Namespace) -> dict[str, Any]:
     if args.mock:
         common.append("--mock")
 
-    if not args.skip_no_llm:
-        no_llm_dir = results_root / "no_llm"
-        run_command(
-            [
-                sys.executable,
-                spec.runner,
-                *common,
-                "--results_dir",
-                str(no_llm_dir),
-                "--ablation",
-                "V7_no_llm",
-                "--llm_enabled",
-                "False",
-            ],
-            args.dry_run,
-        )
-        stages["runs"]["no_llm"] = read_json(no_llm_dir / "summary.json")
-
-    if not args.skip_llm:
-        for backend in args.llm_backends:
-            run_dir = results_root / "llm" / backend
-            cmd = [
-                sys.executable,
-                spec.runner,
-                *common,
-                "--results_dir",
-                str(run_dir),
-                "--ablation",
-                "V5_full",
-                "--llm_enabled",
-                "True",
-                "--llm_backend",
-                backend,
-            ]
-            if not args.local_llm:
-                cmd.append("--remote_llm")
-            run_command(cmd, args.dry_run)
-            stages["runs"][backend] = read_json(run_dir / "summary.json")
+    for ablation_name in args.ablations:
+        if not should_run_ablation(ablation_name, args):
+            print(f"[BeliefGAT] Skipping ablation due to skip flags: {ablation_name}", flush=True)
+            continue
+        llm_enabled = bool(ABLATION_CONFIGS[ablation_name].get("llm_enabled", False))
+        stages["runs"][ablation_name] = {}
+        if llm_enabled:
+            for backend in args.llm_backends:
+                stages["runs"][ablation_name][backend] = run_ablation(
+                    spec,
+                    common,
+                    results_root,
+                    ablation_name,
+                    backend,
+                    args,
+                )
+        else:
+            stages["runs"][ablation_name]["no_llm"] = run_ablation(
+                spec,
+                common,
+                results_root,
+                ablation_name,
+                None,
+                args,
+            )
 
     summary_path = results_root / "publication_summary.json"
     if not args.dry_run:
@@ -203,6 +237,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--checkpoint_root", default="checkpoints/publication")
     parser.add_argument("--api_keys", default="configs/api_keys.yaml")
     parser.add_argument("--llm_backends", nargs="+", default=DEFAULT_GROQ_LLMS)
+    parser.add_argument("--ablations", nargs="+", choices=list(ABLATION_CONFIGS), default=list(ABLATION_CONFIGS))
     parser.add_argument("--local_llm", action="store_true", help="Use deterministic local LLM policy gateway instead of Groq API calls.")
     parser.add_argument("--skip_no_llm", action="store_true")
     parser.add_argument("--skip_llm", action="store_true")
